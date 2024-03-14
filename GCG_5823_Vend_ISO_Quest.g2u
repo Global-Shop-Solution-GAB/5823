@@ -1,0 +1,206 @@
+Program.Sub.ScreenSU.Start
+Gui.FormVend..Create
+Gui.FormVend..Caption("Vendor ISO/Questionaire ")
+Gui.FormVend..Size(15360,10620)
+Gui.FormVend..MinX(0)
+Gui.FormVend..MinY(0)
+Gui.FormVend..Position(0,0)
+Gui.FormVend..BackColor(-2147483633)
+Gui.FormVend..MousePointer(0)
+Gui.FormVend..Event(UnLoad,FormVend_Approval_UnLoad)
+Gui.FormVend.GsGridControlVend.Create(GsGridControl)
+Gui.FormVend.GsGridControlVend.Size(15015,9585)
+Gui.FormVend.GsGridControlVend.Position(120,105)
+Gui.FormVend.GsGridControlVend.Event(RowCellClick,GsGridControlVend_RowCellClick)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+
+	F.Intrinsic.Control.CallSub(Get_Data)
+	F.Intrinsic.Control.CallSub(Set_Properties)
+	
+	gui.FormVend..Show
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5823_Vend_ISO_Quest.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormVend_Approval_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.FormVend_Approval_UnLoad.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	F.Intrinsic.Control.End
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5823_Vend_ISO_Quest.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.FormVend_Approval_UnLoad.End
+
+Program.Sub.Get_Data.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.sSql.Declare(String,"")
+
+	V.Local.sSql.Set("Select a.Vendor, Name_Vendor, IF(ISO_Cert_Date = '1900-01-01',Null,ISO_Cert_Date) as ISO_Cert_Date, UF10 From V_Vendor_Master a Left Join V_Vendor_Addl b on a.Vendor = b.Vendor Left Join CRM_UF_VALUE c on a.Vendor = c.Compid")
+	
+	F.ODBC.Connection!Con.OpenCompanyConnection
+	
+	F.Data.DataTable.CreateFromSQL("Vend","con",V.Local.sSql,True)
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5823_Vend_ISO_Quest.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormVend_Approval_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.Get_Data.End
+
+Program.Sub.Set_Properties.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.sTemp.Declare(String,"")
+	V.Local.dDate.Declare(Date)
+
+	gui.FormVend.GsGridControlVend.Size(15015,10035)
+	gui.FormVend.cmdSave.Visible(False)
+
+	
+	gui.FormVend.GsGridControlVend.Anchor(15)
+	
+	gui.FormVend.GsGridControlVend.AddGridviewFromDatatable("GVend","Vend")
+	
+	gui.FormVend.GsGridControlVend.SetGridviewProperty("GVend","OptionsSelectionEnableAppearanceFocusedRow",False)
+	gui.FormVend.GsGridControlVend.SetGridviewProperty("GVend","Enableappearanceoddrow",True)
+	
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Vendor","ReadOnly",True)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Vendor","AllowEdit",False)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Vendor","HeaderBackColor","Green")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Vendor","HeaderForeColor","White")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Vendor","MaxWidth",60)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Vendor","MinWidth",60)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","ReadOnly",True)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","AllowEdit",False)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","HeaderBackColor","Green")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","HeaderForeColor","White")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","Caption","Vendor Name")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","MaxWidth",200)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","Name_Vendor","MinWidth",200)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","ReadOnly",True)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","AllowEdit",False)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","HeaderBackColor","Green")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","HeaderForeColor","White")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","DisplayCustomDatetime","d")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","MaxWidth",135)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","MinWidth",135)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","ISO_Cert_Date","Caption","ISO Cert Date")
+	
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","ReadOnly",True)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","AllowEdit",False)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","HeaderBackColor","Green")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","HeaderForeColor","White")
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","MaxWidth",135)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","MinWidth",135)
+	gui.FormVend.GsGridControlVend.SetColumnProperty("GVend","UF10","Caption","Next Questionaire Date")
+	
+	F.Intrinsic.String.Build("[ISO_Cert_Date] > #{0}#",V.Ambient.Date,V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","ISO_Cert_Date","ParentGreen","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","ISO_Cert_Date","ParentGreen","BackColor","#90ee90")
+	
+	F.Intrinsic.String.Build("[UF10] > #{0}#",V.Ambient.Date,V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","UF10","ParentGreen","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","UF10","ParentGreen","BackColor","#90ee90")
+	
+	F.Intrinsic.Date.DateAdd("D",-30,V.Ambient.Date,V.Local.dDate)
+	F.Intrinsic.String.Build("[ISO_Cert_Date] < #{0}#",V.Ambient.Date,V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","ISO_Cert_Date","ParentYellow","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","ISO_Cert_Date","ParentYellow","BackColor","#ffffa1")
+	
+	F.Intrinsic.String.Build("[UF10] < #{0}#",V.Ambient.Date,V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","UF10","ParentYellow","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","UF10","ParentYellow","BackColor","#ffffa1")
+	
+	F.Intrinsic.String.Build("[ISO_Cert_Date] < #{0}#",V.Ambient.Date,V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","ISO_Cert_Date","ParentRed","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","ISO_Cert_Date","ParentRed","BackColor","#ffcccb")
+	
+	F.Intrinsic.String.Build("[UF10] < #{0}#",V.Ambient.Date,V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","UF10","ParentRed","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","UF10","ParentRed","BackColor","#ffcccb")
+	
+	V.Local.sTemp.Set("[ISO_Cert_Date] = Null or trim([ISO_Cert_Date]) = ''")
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","ISO_Cert_Date","ParentWhite","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","ISO_Cert_Date","ParentWhite","BackColor","White")
+	
+	V.Local.sTemp.Set("[UF10] = Null or trim([UF10]) = ''")
+	gui.FormVend.GsGridControlVend.AddStyleFormatCondition("GVend","UF10","ParentWhite","Expression",V.Local.sTemp)
+	gui.FormVend.GsGridControlVend.SetStyleFormatConditionProperty("GVend","UF10","ParentWhite","BackColor","White")
+	
+	gui.FormVend.GsGridControlVend.MainView("GVend")
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5823_Vend_ISO_Quest.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormVend_Approval_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.Set_Properties.End
+
+Program.Sub.GsGridControlVend_RowCellClick.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.sFile.Declare(String,"")
+	V.Local.iRet.Declare(Long,0)
+	V.Local.bRet.Declare(Boolean,False)
+	V.Local.bView.Declare(Boolean,False)
+
+	F.Intrinsic.Control.SelectCase(V.Args.Column.UCase)
+		F.Intrinsic.Control.Case("VENDOR")
+			F.Intrinsic.Control.If(V.Global.bUpdate)
+				F.Global.Callwrapper.New("Vend","Accounting.AccountsPayable.VendorMaintenanceOpenVendor")
+				F.Global.Callwrapper.SetProperty("Vend","VendorNumber",V.Args.CellValue)
+				F.Global.CallWrapper.Run("Vend")
+			F.Intrinsic.Control.Else
+				F.Global.Security.CheckUserAccessIPM(3,0,V.Local.bView)
+				F.Intrinsic.Control.If(V.Local.bView)
+					F.Global.Callwrapper.New("Vend","Accounting.AccountsPayable.VendorMaintenanceViewVendor")
+					F.Global.Callwrapper.SetProperty("Vend","VendorNumber",V.Args.CellValue)
+					F.Global.CallWrapper.Run("Vend")
+				F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.EndIf
+			
+	F.Intrinsic.Control.EndSelect
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5823_Vend_ISO_Quest.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormVend_Approval_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry	
+Program.Sub.GsGridControlVend_RowCellClick.End
